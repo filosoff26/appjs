@@ -1,3 +1,4 @@
+const e = require("express");
 const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
@@ -40,6 +41,33 @@ router.get("/", async (req, res) => {
             throw err;
         }
         res.json(result);
+    });
+});
+
+//get todo by id
+router.get("/get-todo/:id", async (req, res) => {
+    let sql = `SELECT * FROM todos WHERE id_todo = ${req.params.id} LIMIT 1`;
+    await connectDB.query(sql, (err, result) => {
+        if (err) {
+            res.status(500).send("Ошибка сервера");
+            throw err;
+        } else {
+            res.json(result[0]);
+        }
+    });
+});
+
+//delete todo
+router.delete("/:id", async (req, res) => {
+    let id = req.params.id;
+    let sql = `DELETE FROM todos WHERE id_todo = ${id}`;
+    await connectDB.query(sql, (err) => {
+        if (err) {
+            res.status(500).send("Ошибка сервера");
+            throw err;
+        } else {
+            res.send("Запись удалена");
+        }
     });
 });
 
@@ -98,6 +126,5 @@ router.delete(
         });
     }
 );
-
 
 module.exports = router;
